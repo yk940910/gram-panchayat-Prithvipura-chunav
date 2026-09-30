@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ग्राम पंचायत एवं वार्ड पंच चुनाव 2026</title>
+    <title>ग्राम पंचायत पृथ्वीपुरा चुनाव 2026 - Live Portal</title>
+
+    <!-- Google Firebase Realtime Database SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f4f7f6; margin: 0; padding: 15px; }
@@ -11,14 +16,11 @@
         .admin-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 10px; }
         .btn { background: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
         .btn-admin { background: #e67e22; }
-        .btn-ward { background: #2980b9; font-size: 16px; padding: 12px 20px; }
-        .btn-save { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; font-size: 15px; }
         .btn-delete { background: #c0392b; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 8px; width: 100%; font-weight: bold; }
         .section-title { background: #2c3e50; color: white; padding: 12px 18px; border-radius: 8px; margin: 20px 0 15px 0; font-size: 20px; border-left: 6px solid #e74c3c; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 12px; padding: 20px 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border: 1px solid #eee; }
         
-        /* छोटी और गोल फ़ोटो की स्टाइल */
         .card img { 
             width: 110px; 
             height: 110px; 
@@ -36,31 +38,31 @@
         .edit-fields input { width: 100%; padding: 8px; margin: 4px 0 8px 0; border: 1px solid #ccc; border-radius: 4px; }
         .results-section { background: white; border-radius: 12px; padding: 20px; margin-top: 30px; }
         .progress-bar-bg { background: #e0e0e0; border-radius: 20px; height: 22px; margin-top: 6px; overflow: hidden; }
-        .progress-bar-fill { background: #27ae60; height: 100%; text-align: right; padding-right: 10px; color: white; font-size: 12px; line-height: 22px; font-weight: bold; width: 0%; transition: width 0.3s ease; }
+        .progress-bar-fill { background: #27ae60; height: 100%; text-align: right; padding-right: 10px; color: white; font-size: 12px; line-height: 22px; font-weight: bold; width: 0%; transition: width 0.4s ease; }
         .login-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 100; }
         .login-content { background: white; padding: 25px; border-radius: 10px; text-align: center; width: 300px; }
         .login-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .live-badge { background: #e74c3c; color: white; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>ग्राम पंचायत चुनाव 2026</h1>
-        <p>सरपंच पद चुनाव एवं वार्ड पंच चुनाव पोर्टल</p>
+        <h1>ग्राम पंचायत पृथ्वीपुरा चुनाव 2026</h1>
+        <p>सरपंच पद चुनाव एवं लाइव वोटिंग पोर्टल <span class="live-badge">🔴 LIVE UPDATE</span></p>
     </div>
 
     <div class="admin-bar">
         <span id="admin-status" style="font-weight: bold; color: #555;">मोड: सामान्य यूजर</span>
         <div>
-            <a href="ward.html" class="btn btn-ward">🚩 वार्ड पंच प्रत्याशी (वार्ड 1 से 9)</a>
-            <button id="add-btn" class="btn" style="display:none; background:#8e44ad;" onclick="addCandidate()">+ नया सरपंच प्रत्याशी</button>
-            <button id="reset-vote-btn" class="btn" style="display:none; background:#7f8c8d;" onclick="resetVotes()">सरपंच वोट रीसेट</button>
+            <button id="add-btn" class="btn" style="display:none; background:#8e44ad;" onclick="addCandidate()">+ नया प्रत्याशी</button>
+            <button id="reset-vote-btn" class="btn" style="display:none; background:#7f8c8d;" onclick="resetVotes()">वोट रीसेट करें</button>
             <button id="auth-btn" class="btn btn-admin" onclick="toggleAuth()">Admin Login</button>
         </div>
     </div>
 
     <div class="section-title">🚩 सरपंच पद के प्रत्याशी</div>
-    <div class="grid" id="sarpanch-grid"></div>
+    <div class="grid" id="sarpanch-grid">लाइव डेटा कनेक्ट हो रहा है...</div>
 
     <div class="results-section">
         <h2>📊 सरपंच पद लाइव नतीजे</h2>
@@ -77,66 +79,42 @@
     </div>
 
     <script>
+        // आपकी रियल Firebase प्रोजेक्ट कॉन्फ़िगरेशन
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0BuD5mx-ppM40j_O2m1H569malJNX26Y",
+            authDomain: "panchayat-prithvipura-chunav.firebaseapp.com",
+            databaseURL: "https://panchayat-prithvipura-chunav-default-rtdb.firebaseio.com",
+            projectId: "panchayat-prithvipura-chunav",
+            storageBucket: "panchayat-prithvipura-chunav.firebasestorage.app",
+            messagingSenderId: "1019711870876",
+            appId: "1:1019711870876:web:bbcfae0b77916fb1935a59",
+            measurementId: "G-E15MNMW7S9"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let isAdmin = false;
         const DEFAULT_PASS = "Yogesh@2004";
         let candidates = [];
 
-        // IndexedDB Storage
-        const DB_NAME = "PanchayatElectionDB";
-        const DB_VERSION = 1;
-        let db;
-
-        function openDatabase() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onerror = (e) => reject("DB Error: " + e.target.errorCode);
-                request.onsuccess = (e) => {
-                    db = e.target.result;
-                    resolve(db);
-                };
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains("candidates")) {
-                        db.createObjectStore("candidates", { keyPath: "id" });
-                    }
-                };
-            });
-        }
-
-        function getCandidatesFromDB() {
-            return new Promise((resolve) => {
-                const tx = db.transaction("candidates", "readonly");
-                const store = tx.objectStore("candidates");
-                const req = store.getAll();
-                req.onsuccess = () => resolve(req.result);
-            });
-        }
-
-        function saveAllToDB() {
-            return new Promise((resolve) => {
-                const tx = db.transaction("candidates", "readwrite");
-                const store = tx.objectStore("candidates");
-                store.clear().onsuccess = () => {
-                    candidates.forEach(c => store.put(c));
-                    tx.oncomplete = () => resolve();
-                };
-            });
-        }
-
-        async function initApp() {
-            await openDatabase();
-            let savedData = await getCandidatesFromDB();
-            
-            if (!savedData || savedData.length === 0) {
-                candidates = [
-                    { id: 1, name: "सरपंच प्रत्याशी 1", location: "ग्राम पंचायत रामपुर", symbol: "चश्मा", votes: 0, image: "https://via.placeholder.com/150?text=Candidate+1" },
-                    { id: 2, name: "सरपंच प्रत्याशी 2", location: "ग्राम पंचायत रामपुर", symbol: "ट्रैक्टर", votes: 0, image: "https://via.placeholder.com/150?text=Candidate+2" }
-                ];
-                await saveAllToDB();
+        // 🔴 रियल-टाइम डेटा सुनने के लिए (Realtime Listener)
+        db.ref('sarpanch_candidates').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                candidates = data;
             } else {
-                candidates = savedData;
+                candidates = [
+                    { id: 1, name: "सरपंच प्रत्याशी 1", location: "ग्राम पंचायत पृथ्वीपुरा", symbol: "चश्मा", votes: 0, image: "https://via.placeholder.com/150?text=Candidate+1" },
+                    { id: 2, name: "सरपंच प्रत्याशी 2", location: "ग्राम पंचायत पृथ्वीपुरा", symbol: "ट्रैक्टर", votes: 0, image: "https://via.placeholder.com/150?text=Candidate+2" }
+                ];
+                db.ref('sarpanch_candidates').set(candidates);
             }
             renderCandidates();
+        });
+
+        function syncToCloud() {
+            return db.ref('sarpanch_candidates').set(candidates);
         }
 
         function renderCandidates() {
@@ -152,22 +130,14 @@
                         <p><b>चिन्ह:</b> ${c.symbol}</p>
                         ${isAdmin ? `
                             <div class="edit-fields" style="display:block;">
-                                <label><b>1. फ़ोटो का URL लिंक डालें:</b></label>
-                                <input type="text" id="img-url-${index}" value="${c.image.startsWith('data:') ? '' : c.image}" placeholder="https://example.com/photo.jpg" onchange="updateDataDirect(${index}, 'image', this.value)">
-                                
-                                <label><b>2. या गैलरी से फ़ोटो अपलोड करें:</b></label>
-                                <input type="file" accept="image/*" onchange="uploadImage(event, ${index})">
-                                
+                                <label>फोटो URL Link:</label>
+                                <input type="text" id="img-${index}" value="${c.image}" onchange="updateCandidate(${index})">
                                 <label>नाम:</label>
-                                <input type="text" id="name-${index}" value="${c.name}" onchange="updateDataDirect(${index}, 'name', this.value)">
-                                
+                                <input type="text" id="name-${index}" value="${c.name}" onchange="updateCandidate(${index})">
                                 <label>स्थान:</label>
-                                <input type="text" id="loc-${index}" value="${c.location}" onchange="updateDataDirect(${index}, 'location', this.value)">
-                                
+                                <input type="text" id="loc-${index}" value="${c.location}" onchange="updateCandidate(${index})">
                                 <label>चिन्ह:</label>
-                                <input type="text" id="sym-${index}" value="${c.symbol}" onchange="updateDataDirect(${index}, 'symbol', this.value)">
-                                
-                                <button class="btn-save" onclick="manualSaveCandidate(${index})">💾 बदलाव सेव करें</button>
+                                <input type="text" id="sym-${index}" value="${c.symbol}" onchange="updateCandidate(${index})">
                                 <button class="btn-delete" onclick="deleteCandidate(${index})">🗑️ प्रत्याशी हटाएं</button>
                             </div>
                         ` : `
@@ -182,13 +152,14 @@
         function renderResults() {
             const res = document.getElementById('sarpanch-results');
             res.innerHTML = '';
-            let totalVotes = candidates.reduce((sum, c) => sum + c.votes, 0);
+            let totalVotes = candidates.reduce((sum, c) => sum + (c.votes || 0), 0);
 
             candidates.forEach(c => {
-                let percentage = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0;
+                let votes = c.votes || 0;
+                let percentage = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
                 res.innerHTML += `
                     <div style="margin-bottom: 12px;">
-                        <strong>${c.name} (${c.symbol}):</strong> ${c.votes} वोट (${percentage}%)
+                        <strong>${c.name} (${c.symbol}):</strong> ${votes} वोट (${percentage}%)
                         <div class="progress-bar-bg">
                             <div class="progress-bar-fill" style="width: ${percentage}%;">${percentage}%</div>
                         </div>
@@ -199,85 +170,40 @@
 
         async function castVote(index) {
             let voted = localStorage.getItem('voted_sarpanch');
-            if(voted) { alert("आप सरपंच पद के लिए वोट दे चुके हैं!"); return; }
-            candidates[index].votes++;
+            if(voted) { alert("आप पहले ही वोट दे चुके हैं!"); return; }
+            
+            candidates[index].votes = (candidates[index].votes || 0) + 1;
             localStorage.setItem('voted_sarpanch', 'true');
-            await saveAndRefresh();
-            alert("आपका सरपंच वोट दर्ज हो गया है!");
+            await syncToCloud();
+            alert("आपका वोट तुरंत ऑनलाइन दर्ज हो गया है!");
         }
 
-        async function addCandidate() {
-            candidates.push({ 
-                id: Date.now(), 
-                name: "नया प्रत्याशी", 
-                location: "ग्राम पंचायत", 
-                symbol: "चिन्ह", 
-                votes: 0, 
-                image: "https://via.placeholder.com/150?text=Photo" 
-            });
-            await saveAndRefresh();
+        function updateCandidate(index) {
+            candidates[index].name = document.getElementById(`name-${index}`).value;
+            candidates[index].location = document.getElementById(`loc-${index}`).value;
+            candidates[index].symbol = document.getElementById(`sym-${index}`).value;
+            candidates[index].image = document.getElementById(`img-${index}`).value;
+            syncToCloud();
         }
 
-        async function deleteCandidate(index) {
-            if (confirm("क्या आप इस प्रत्याशी को हटाना चाहते हैं?")) { 
-                candidates.splice(index, 1); 
-                await saveAndRefresh(); 
+        function addCandidate() {
+            candidates.push({ id: Date.now(), name: "नया प्रत्याशी", location: "ग्राम पंचायत पृथ्वीपुरा", symbol: "चिन्ह", votes: 0, image: "https://via.placeholder.com/150?text=Photo" });
+            syncToCloud();
+        }
+
+        function deleteCandidate(index) {
+            if(confirm("क्या आप इस प्रत्याशी को हटाना चाहते हैं?")) {
+                candidates.splice(index, 1);
+                syncToCloud();
             }
         }
 
-        function uploadImage(event, index) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 10 * 1024 * 1024) {
-                alert("कृपया 10MB से छोटी फ़ोटो चुनें!");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = async function() { 
-                candidates[index].image = reader.result; 
-                await saveAndRefresh(); 
-                alert("फ़ोटो सफलतापूर्वक सेव हो गई है!");
-            }
-            reader.readAsDataURL(file);
-        }
-
-        function updateDataDirect(index, field, value) { 
-            if(value.trim() !== '') {
-                candidates[index][field] = value; 
-            }
-        }
-
-        // मैन्युअल सेव बटन पर क्लिक करने पर
-        async function manualSaveCandidate(index) {
-            const nameVal = document.getElementById(`name-${index}`).value;
-            const locVal = document.getElementById(`loc-${index}`).value;
-            const symVal = document.getElementById(`sym-${index}`).value;
-            const urlVal = document.getElementById(`img-url-${index}`).value;
-
-            if (nameVal) candidates[index].name = nameVal;
-            if (locVal) candidates[index].location = locVal;
-            if (symVal) candidates[index].symbol = symVal;
-            if (urlVal && !candidates[index].image.startsWith('data:')) {
-                candidates[index].image = urlVal;
-            }
-
-            await saveAndRefresh();
-            alert("प्रत्याशी की जानकारी सफलतापूर्वक सेव हो गई है! ✅");
-        }
-
-        async function resetVotes() {
-            if (confirm("क्या आप सभी वोट 0 करना चाहते हैं?")) {
+        function resetVotes() {
+            if(confirm("क्या आप सभी वोट 0 करना चाहते हैं?")) {
                 candidates.forEach(c => c.votes = 0);
                 localStorage.removeItem('voted_sarpanch');
-                await saveAndRefresh();
+                syncToCloud();
             }
-        }
-
-        async function saveAndRefresh() {
-            await saveAllToDB();
-            renderCandidates();
         }
 
         function toggleAuth() {
@@ -303,16 +229,10 @@
                 document.getElementById('adminPassword').value = '';
                 closeLogin();
                 renderCandidates();
-            } else { 
-                alert("गलत पासवर्ड!"); 
-            }
+            } else { alert("गलत पासवर्ड!"); }
         }
 
-        function closeLogin() { 
-            document.getElementById('loginModal').style.display = 'none'; 
-        }
-
-        initApp();
+        function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
     </script>
 </body>
 </html>
