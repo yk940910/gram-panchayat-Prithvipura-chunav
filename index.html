@@ -12,20 +12,21 @@
         .btn { background: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
         .btn-admin { background: #e67e22; }
         .btn-ward { background: #2980b9; font-size: 16px; padding: 12px 20px; }
-        .btn-delete { background: #c0392b; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
+        .btn-save { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; font-size: 15px; }
+        .btn-delete { background: #c0392b; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 8px; width: 100%; font-weight: bold; }
         .section-title { background: #2c3e50; color: white; padding: 12px 18px; border-radius: 8px; margin: 20px 0 15px 0; font-size: 20px; border-left: 6px solid #e74c3c; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 12px; padding: 20px 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border: 1px solid #eee; }
         
-        /* छोटे और गोल फ़ोटो की नई स्टाइलिंग */
+        /* छोटी और गोल फ़ोटो की स्टाइल */
         .card img { 
             width: 110px; 
             height: 110px; 
             object-fit: cover; 
-            border-radius: 50%; /* गोल शेप */
+            border-radius: 50%; 
             margin: 0 auto 12px auto; 
             display: block;
-            border: 3px solid #2980b9; /* सुंदर नीली बॉर्डर */
+            border: 3px solid #2980b9; 
             box-shadow: 0 3px 6px rgba(0,0,0,0.15);
             background-color: #eaeaea; 
         }
@@ -80,7 +81,7 @@
         const DEFAULT_PASS = "Yogesh@2004";
         let candidates = [];
 
-        // IndexedDB Configuration (100MB+ Storage)
+        // IndexedDB Storage
         const DB_NAME = "PanchayatElectionDB";
         const DB_VERSION = 1;
         let db;
@@ -135,7 +136,7 @@
             } else {
                 candidates = savedData;
             }
-                renderCandidates();
+            renderCandidates();
         }
 
         function renderCandidates() {
@@ -152,20 +153,21 @@
                         ${isAdmin ? `
                             <div class="edit-fields" style="display:block;">
                                 <label><b>1. फ़ोटो का URL लिंक डालें:</b></label>
-                                <input type="text" value="${c.image.startsWith('data:') ? '' : c.image}" placeholder="https://example.com/photo.jpg" onchange="updateData(${index}, 'image', this.value)">
+                                <input type="text" id="img-url-${index}" value="${c.image.startsWith('data:') ? '' : c.image}" placeholder="https://example.com/photo.jpg" onchange="updateDataDirect(${index}, 'image', this.value)">
                                 
                                 <label><b>2. या गैलरी से फ़ोटो अपलोड करें:</b></label>
                                 <input type="file" accept="image/*" onchange="uploadImage(event, ${index})">
                                 
                                 <label>नाम:</label>
-                                <input type="text" value="${c.name}" onchange="updateData(${index}, 'name', this.value)">
+                                <input type="text" id="name-${index}" value="${c.name}" onchange="updateDataDirect(${index}, 'name', this.value)">
                                 
                                 <label>स्थान:</label>
-                                <input type="text" value="${c.location}" onchange="updateData(${index}, 'location', this.value)">
+                                <input type="text" id="loc-${index}" value="${c.location}" onchange="updateDataDirect(${index}, 'location', this.value)">
                                 
                                 <label>चिन्ह:</label>
-                                <input type="text" value="${c.symbol}" onchange="updateData(${index}, 'symbol', this.value)">
+                                <input type="text" id="sym-${index}" value="${c.symbol}" onchange="updateDataDirect(${index}, 'symbol', this.value)">
                                 
+                                <button class="btn-save" onclick="manualSaveCandidate(${index})">💾 बदलाव सेव करें</button>
                                 <button class="btn-delete" onclick="deleteCandidate(${index})">🗑️ प्रत्याशी हटाएं</button>
                             </div>
                         ` : `
@@ -236,13 +238,33 @@
             reader.onload = async function() { 
                 candidates[index].image = reader.result; 
                 await saveAndRefresh(); 
+                alert("फ़ोटो सफलतापूर्वक सेव हो गई है!");
             }
             reader.readAsDataURL(file);
         }
 
-        async function updateData(index, field, value) { 
-            candidates[index][field] = value; 
-            await saveAndRefresh(); 
+        function updateDataDirect(index, field, value) { 
+            if(value.trim() !== '') {
+                candidates[index][field] = value; 
+            }
+        }
+
+        // मैन्युअल सेव बटन पर क्लिक करने पर
+        async function manualSaveCandidate(index) {
+            const nameVal = document.getElementById(`name-${index}`).value;
+            const locVal = document.getElementById(`loc-${index}`).value;
+            const symVal = document.getElementById(`sym-${index}`).value;
+            const urlVal = document.getElementById(`img-url-${index}`).value;
+
+            if (nameVal) candidates[index].name = nameVal;
+            if (locVal) candidates[index].location = locVal;
+            if (symVal) candidates[index].symbol = symVal;
+            if (urlVal && !candidates[index].image.startsWith('data:')) {
+                candidates[index].image = urlVal;
+            }
+
+            await saveAndRefresh();
+            alert("प्रत्याशी की जानकारी सफलतापूर्वक सेव हो गई है! ✅");
         }
 
         async function resetVotes() {
