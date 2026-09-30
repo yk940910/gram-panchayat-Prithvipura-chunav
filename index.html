@@ -8,21 +8,30 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f4f7f6; margin: 0; padding: 15px; }
         .header { background: linear-gradient(to right, #2a5298, #1e3c72); color: white; text-align: center; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        .admin-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .admin-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 10px; }
         .btn { background: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
         .btn-admin { background: #e67e22; }
-        .btn-ward { background: #2980b9; font-size: 16px; padding: 12px 20px; margin-top: 10px; }
+        .btn-ward { background: #2980b9; font-size: 16px; padding: 12px 20px; }
         .btn-delete { background: #c0392b; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
         .section-title { background: #2c3e50; color: white; padding: 12px 18px; border-radius: 8px; margin: 20px 0 15px 0; font-size: 20px; border-left: 6px solid #e74c3c; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border: 1px solid #eee; }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
+        
+        .card img { 
+            width: 100%; 
+            height: 220px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            background-color: #eaeaea; 
+            border: 1px solid #ddd;
+        }
+
         .vote-btn { background: #2980b9; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; margin-top: 10px; cursor: pointer; font-weight: bold; }
-        .edit-fields { display: none; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px; text-align: left; }
-        .edit-fields input { width: 100%; padding: 6px; margin: 2px 0 6px 0; border: 1px solid #ccc; border-radius: 4px; }
+        .edit-fields { display: none; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px; text-align: left; font-size: 14px; }
+        .edit-fields input { width: 100%; padding: 8px; margin: 4px 0 8px 0; border: 1px solid #ccc; border-radius: 4px; }
         .results-section { background: white; border-radius: 12px; padding: 20px; margin-top: 30px; }
         .progress-bar-bg { background: #e0e0e0; border-radius: 20px; height: 22px; margin-top: 6px; overflow: hidden; }
-        .progress-bar-fill { background: #27ae60; height: 100%; text-align: right; padding-right: 10px; color: white; font-size: 12px; line-height: 22px; font-weight: bold; width: 0%; }
+        .progress-bar-fill { background: #27ae60; height: 100%; text-align: right; padding-right: 10px; color: white; font-size: 12px; line-height: 22px; font-weight: bold; width: 0%; transition: width 0.3s ease; }
         .login-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 100; }
         .login-content { background: white; padding: 25px; border-radius: 10px; text-align: center; width: 300px; }
         .login-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
@@ -32,34 +41,31 @@
 
     <div class="header">
         <h1>ग्राम पंचायत चुनाव 2026</h1>
-        <p>सरपंच पद चुनाव एवं वार्ड पंच चुनाव पोर्टल</p>
+        <p>सरपंच पद चुनाव एवं वार्ड पंच चुनाव पोर्टल (100MB+ IndexedDB Storage)</p>
     </div>
 
     <div class="admin-bar">
         <span id="admin-status" style="font-weight: bold; color: #555;">मोड: सामान्य यूजर</span>
         <div>
-            <a href="ward.html" class="btn btn-ward">🚩 वार्ड पंच प्रत्याशियों की फाइल खोलें (वार्ड 1 से 9)</a>
+            <a href="ward.html" class="btn btn-ward">🚩 वार्ड पंच प्रत्याशी (वार्ड 1 से 9)</a>
             <button id="add-btn" class="btn" style="display:none; background:#8e44ad;" onclick="addCandidate()">+ नया सरपंच प्रत्याशी</button>
             <button id="reset-vote-btn" class="btn" style="display:none; background:#7f8c8d;" onclick="resetVotes()">सरपंच वोट रीसेट</button>
             <button id="auth-btn" class="btn btn-admin" onclick="toggleAuth()">Admin Login</button>
         </div>
     </div>
 
-    <!-- सरपंच प्रत्याशी सेक्शन -->
     <div class="section-title">🚩 सरपंच पद के प्रत्याशी</div>
     <div class="grid" id="sarpanch-grid"></div>
 
-    <!-- सरपंच लाइव परिणाम -->
     <div class="results-section">
         <h2>📊 सरपंच पद लाइव नतीजे</h2>
         <div id="sarpanch-results"></div>
     </div>
 
-    <!-- Login Modal -->
     <div class="login-modal" id="loginModal">
         <div class="login-content">
             <h3>एडमिन लॉगिन</h3>
-            <input type="password" id="adminPassword" placeholder="पासवर्ड">
+            <input type="password" id="adminPassword" placeholder="पासवर्ड दर्ज करें">
             <button class="btn" onclick="checkPassword()">लॉगिन</button>
             <button class="btn" style="background:#e74c3c; margin-top:5px;" onclick="closeLogin()">रद्द</button>
         </div>
@@ -68,11 +74,65 @@
     <script>
         let isAdmin = false;
         const DEFAULT_PASS = "Yogesh@2004";
+        let candidates = [];
 
-        let candidates = JSON.parse(localStorage.getItem('sarpanch_only_v1')) || [
-            { id: 1, name: "सरपंच प्रत्याशी 1", location: "ग्राम पंचायत रामपुर", symbol: "चश्मा", votes: 0, image: "https://via.placeholder.com/200" },
-            { id: 2, name: "सरपंच प्रत्याशी 2", location: "ग्राम पंचायत रामपुर", symbol: "ट्रैक्टर", votes: 0, image: "https://via.placeholder.com/200" }
-        ];
+        // IndexedDB Configuration (100MB+ Memory)
+        const DB_NAME = "PanchayatElectionDB";
+        const DB_VERSION = 1;
+        let db;
+
+        function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = (e) => reject("DB Error: " + e.target.errorCode);
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains("candidates")) {
+                        db.createObjectStore("candidates", { keyPath: "id" });
+                    }
+                };
+            });
+        }
+
+        function getCandidatesFromDB() {
+            return new Promise((resolve) => {
+                const tx = db.transaction("candidates", "readonly");
+                const store = tx.objectStore("candidates");
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result);
+            });
+        }
+
+        function saveAllToDB() {
+            return new Promise((resolve) => {
+                const tx = db.transaction("candidates", "readwrite");
+                const store = tx.objectStore("candidates");
+                store.clear().onsuccess = () => {
+                    candidates.forEach(c => store.put(c));
+                    tx.oncomplete = () => resolve();
+                };
+            });
+        }
+
+        async function initApp() {
+            await openDatabase();
+            let savedData = await getCandidatesFromDB();
+            
+            if (!savedData || savedData.length === 0) {
+                candidates = [
+                    { id: 1, name: "सरपंच प्रत्याशी 1", location: "ग्राम पंचायत रामपुर", symbol: "चश्मा", votes: 0, image: "https://via.placeholder.com/300x200?text=Candidate+1" },
+                    { id: 2, name: "सरपंच प्रत्याशी 2", location: "ग्राम पंचायत रामपुर", symbol: "ट्रैक्टर", votes: 0, image: "https://via.placeholder.com/300x200?text=Candidate+2" }
+                ];
+                await saveAllToDB();
+            } else {
+                candidates = savedData;
+            }
+            renderCandidates();
+        }
 
         function renderCandidates() {
             const grid = document.getElementById('sarpanch-grid');
@@ -81,17 +141,28 @@
             candidates.forEach((c, index) => {
                 grid.innerHTML += `
                     <div class="card">
-                        <img src="${c.image}">
+                        <img src="${c.image}" alt="${c.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
                         <h3>${c.name}</h3>
                         <p><b>स्थान:</b> ${c.location}</p>
                         <p><b>चिन्ह:</b> ${c.symbol}</p>
                         ${isAdmin ? `
                             <div class="edit-fields" style="display:block;">
-                                <label>फोटो बदलें:</label><input type="file" accept="image/*" onchange="uploadImage(event, ${index})">
-                                <label>नाम:</label><input type="text" value="${c.name}" onchange="updateData(${index}, 'name', this.value)">
-                                <label>स्थान:</label><input type="text" value="${c.location}" onchange="updateData(${index}, 'location', this.value)">
-                                <label>चिन्ह:</label><input type="text" value="${c.symbol}" onchange="updateData(${index}, 'symbol', this.value)">
-                                <button class="btn-delete" onclick="deleteCandidate(${index})">🗑️ हटाएं</button>
+                                <label><b>1. फ़ोटो का URL लिंक डालें:</b></label>
+                                <input type="text" value="${c.image.startsWith('data:') ? '' : c.image}" placeholder="https://example.com/photo.jpg" onchange="updateData(${index}, 'image', this.value)">
+                                
+                                <label><b>2. या गैलरी से फ़ोटो अपलोड करें:</b></label>
+                                <input type="file" accept="image/*" onchange="uploadImage(event, ${index})">
+                                
+                                <label>नाम:</label>
+                                <input type="text" value="${c.name}" onchange="updateData(${index}, 'name', this.value)">
+                                
+                                <label>स्थान:</label>
+                                <input type="text" value="${c.location}" onchange="updateData(${index}, 'location', this.value)">
+                                
+                                <label>चिन्ह:</label>
+                                <input type="text" value="${c.symbol}" onchange="updateData(${index}, 'symbol', this.value)">
+                                
+                                <button class="btn-delete" onclick="deleteCandidate(${index})">🗑️ प्रत्याशी हटाएं</button>
                             </div>
                         ` : `
                             <button class="vote-btn" onclick="castVote(${index})">वोट दें</button>
@@ -120,42 +191,67 @@
             });
         }
 
-        function castVote(index) {
+        async function castVote(index) {
             let voted = localStorage.getItem('voted_sarpanch');
             if(voted) { alert("आप सरपंच पद के लिए वोट दे चुके हैं!"); return; }
             candidates[index].votes++;
             localStorage.setItem('voted_sarpanch', 'true');
-            saveAndRefresh();
+            await saveAndRefresh();
             alert("आपका सरपंच वोट दर्ज हो गया है!");
         }
 
-        function addCandidate() {
-            candidates.push({ id: Date.now(), name: "नया प्रत्याशी", location: "स्थान", symbol: "चिन्ह", votes: 0, image: "https://via.placeholder.com/200" });
-            saveAndRefresh();
+        async function addCandidate() {
+            candidates.push({ 
+                id: Date.now(), 
+                name: "नया प्रत्याशी", 
+                location: "ग्राम पंचायत", 
+                symbol: "चिन्ह", 
+                votes: 0, 
+                image: "https://via.placeholder.com/300x200?text=New+Candidate" 
+            });
+            await saveAndRefresh();
         }
 
-        function deleteCandidate(index) {
-            if (confirm("हटायें?")) { candidates.splice(index, 1); saveAndRefresh(); }
-        }
-
-        function uploadImage(event, index) {
-            const reader = new FileReader();
-            reader.onload = function() { candidates[index].image = reader.result; saveAndRefresh(); }
-            reader.readAsDataURL(event.target.files[0]);
-        }
-
-        function updateData(index, field, value) { candidates[index][field] = value; saveAndRefresh(); }
-
-        function resetVotes() {
-            if (confirm("सभी वोट 0 करें?")) {
-                candidates.forEach(c => c.votes = 0);
-                localStorage.removeItem('voted_sarpanch');
-                saveAndRefresh();
+        async function deleteCandidate(index) {
+            if (confirm("क्या आप इस प्रत्याशी को हटाना चाहते हैं?")) { 
+                candidates.splice(index, 1); 
+                await saveAndRefresh(); 
             }
         }
 
-        function saveAndRefresh() {
-            localStorage.setItem('sarpanch_only_v1', JSON.stringify(candidates));
+        function uploadImage(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // IndexedDB 10MB तक की बड़ी इमेज आसानी से संभाल सकता है
+            if (file.size > 10 * 1024 * 1024) {
+                alert("कृपया 10MB से छोटी फ़ोटो चुनें!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function() { 
+                candidates[index].image = reader.result; 
+                await saveAndRefresh(); 
+            }
+            reader.readAsDataURL(file);
+        }
+
+        async function updateData(index, field, value) { 
+            candidates[index][field] = value; 
+            await saveAndRefresh(); 
+        }
+
+        async function resetVotes() {
+            if (confirm("क्या आप सभी वोट 0 करना चाहते हैं?")) {
+                candidates.forEach(c => c.votes = 0);
+                localStorage.removeItem('voted_sarpanch');
+                await saveAndRefresh();
+            }
+        }
+
+        async function saveAndRefresh() {
+            await saveAllToDB();
             renderCandidates();
         }
 
@@ -179,13 +275,20 @@
                 document.getElementById('auth-btn').innerText = "Logout";
                 document.getElementById('add-btn').style.display = "inline-block";
                 document.getElementById('reset-vote-btn').style.display = "inline-block";
+                document.getElementById('adminPassword').value = '';
                 closeLogin();
                 renderCandidates();
-            } else { alert("गलत पासवर्ड!"); }
+            } else { 
+                alert("गलत पासवर्ड!"); 
+            }
         }
 
-        function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
-        renderCandidates();
+        function closeLogin() { 
+            document.getElementById('loginModal').style.display = 'none'; 
+        }
+
+        // IndexedDB और डेटा लोड करें
+        initApp();
     </script>
 </body>
 </html>
