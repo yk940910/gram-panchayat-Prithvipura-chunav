@@ -22,7 +22,6 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 12px; padding: 20px 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border: 1px solid #eee; }
         
-        /* गोल और सुंदर फोटो स्टाइल */
         .card img { 
             width: 110px; 
             height: 110px; 
@@ -81,7 +80,6 @@
     </div>
 
     <script>
-        // आपकी Firebase प्रोजेक्ट कॉन्फ़िगरेशन
         const firebaseConfig = {
             apiKey: "AIzaSyB0BuD5mx-ppM40j_O2m1H569malJNX26Y",
             authDomain: "panchayat-prithvipura-chunav.firebaseapp.com",
@@ -100,7 +98,7 @@
         const DEFAULT_PASS = "Yogesh@2004";
         let candidates = [];
 
-        // रियल-टाइम लाइव डेटा लिसनर
+        // रियल-टाइम लिसनर (डेटा सिंक रखने के लिए)
         db.ref('sarpanch_candidates').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -113,10 +111,13 @@
                 db.ref('sarpanch_candidates').set(candidates);
             }
             renderCandidates();
+        }, (error) => {
+            alert("Firebase Error: " + error.message + "\nकृपया अपने Firebase Rules में .read और .write को true करें!");
         });
 
         function syncToCloud() {
-            return db.ref('sarpanch_candidates').set(candidates);
+            return db.ref('sarpanch_candidates').set(candidates)
+                .catch(err => alert("डेटा सेव नहीं हुआ: " + err.message));
         }
 
         function renderCandidates() {
@@ -175,25 +176,32 @@
             });
         }
 
-        // गैलरी से चुनी गई फोटो का तुरंत प्रिव्यू दिखाने के लिए
+        // फोटो को छोटा (Compress) करके सेव करने का फ़ंक्शन
         function previewImage(event, index) {
             const file = event.target.files[0];
             if (!file) return;
 
-            if (file.size > 2 * 1024 * 1024) {
-                alert("कृपया 2MB से छोटी फ़ोटो चुनें!");
-                return;
-            }
-
             const reader = new FileReader();
-            reader.onload = function() {
-                document.getElementById(`preview-img-${index}`).src = reader.result;
-                candidates[index].tempImage = reader.result;
-            }
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // फोटो को 150x150 पिक्सल में रीसाइज़ करें ताकि साइज़ बहुत छोटा (20 KB) हो जाए
+                    canvas.width = 150;
+                    canvas.height = 150;
+                    ctx.drawImage(img, 0, 0, 150, 150);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById(`preview-img-${index}`).src = compressedBase64;
+                    candidates[index].tempImage = compressedBase64;
+                };
+                img.src = e.target.result;
+            };
             reader.readAsDataURL(file);
         }
 
-        // सेव बटन दबाने पर सारा डेटा ऑनलाइन सेव होगा
         async function manualSaveCandidate(index) {
             const nameVal = document.getElementById(`name-${index}`).value;
             const locVal = document.getElementById(`loc-${index}`).value;
