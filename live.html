@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>लाइव परिणाम - ग्राम पंचायत एवं वार्ड पंच चुनाव 2026 (पृथ्वीपुरा)</title>
+    <meta name="description" content="ग्राम पंचायत एवं वार्ड पंच चुनाव 2026: पृथ्वीपुरा पंचायत के चुनाव परिणाम के लाइव आंकड़े ऑनलाइन देखें।">
+    <meta name="keywords" content="पृथ्वीपुरा लाइव परिणाम, ग्राम पंचायत चुनाव रिजल्ट 2026, Prithvipura Live Result 2026">
+    <meta name="robots" content="index, follow">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .live-badge {
+            background-color: #dc2626;
+            color: white;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 10px;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .results-table th, .results-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .results-table th {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .leading {
+            background-color: #dcfce7;
+            font-weight: bold;
+        }
+
+        .status-tag {
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .status-leading {
+            background-color: #16a34a;
+            color: white;
+        }
+
+        .status-trailing {
+            background-color: #9ca3af;
+            color: white;
+        }
+
+        .footer-info {
+            padding: 15px;
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <span class="live-badge">🔴 LIVE UPDATES</span>
+        <h2>ग्राम पंचायत चुनाव 2026 - मतगणना परिणाम</h2>
+        <p>ग्राम पंचायत: पृथ्वीपुरा</p>
+    </div>
+
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th>उम्मीदवार का नाम</th>
+                <th>पद</th>
+                <th>कुल वोट</th>
+                <th>स्थिति</th>
+            </tr>
+        </thead>
+        <tbody id="results-body">
+            <!-- यहाँ लाइव डाटा JavaScript से अपडेट होगा -->
+            <tr class="leading">
+                <td>उम्मीदवार A</td>
+                <td>सरपंच</td>
+                <td>450</td>
+                <td><span class="status-tag status-leading">आगे</span></td>
+            </tr>
+            <tr>
+                <td>उम्मीदवार B</td>
+                <td>सरपंच</td>
+                <td>320</td>
+                <td><span class="status-tag status-trailing">पीछे</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer-info">
+        अंतिम अपडेट: <span id="last-updated">अभी</span> | डेटा हर कुछ मिनट में स्वतः अपडेट होता है।
+    </div>
+</div>
+
+<script>
+    // हर बार अपडेट होने का समय दर्शाने के लिए फ़ंक्शन
+    function updateTimestamp() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('hi-IN');
+        document.getElementById('last-updated').innerText = timeString;
+    }
+
+    // यहाँ आप बाद में अपने लाइव डाटा या ऑटो-रिफ्रेश लॉजिक को जोड़ सकते हैं
+    setInterval(updateTimestamp, 60000); // हर 1 मिनट में समय अपडेट करेगा
+    updateTimestamp();
+</script>
+
+</body>
+</html>

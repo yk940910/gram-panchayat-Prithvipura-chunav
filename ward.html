@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>वार्ड पंच चुनाव (वार्ड 1 से 9)</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; margin: 0; padding: 15px; }
+        .header { background: linear-gradient(to right, #11998e, #38ef7d); color: white; text-align: center; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .admin-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn { background: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
+        .btn-admin { background: #e67e22; }
+        .btn-delete { background: #c0392b; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
+        .ward-selector { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 18px; font-weight: bold; }
+        .ward-selector select { font-size: 16px; padding: 8px 15px; border-radius: 6px; border: 2px solid #27ae60; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border: 1px solid #eee; }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
+        .vote-btn { background: #27ae60; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        .edit-fields { display: none; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px; text-align: left; }
+        .edit-fields input { width: 100%; padding: 6px; margin: 2px 0 6px 0; border: 1px solid #ccc; border-radius: 4px; }
+        .results-section { background: white; border-radius: 12px; padding: 20px; margin-top: 30px; }
+        .progress-bar-bg { background: #e0e0e0; border-radius: 20px; height: 22px; margin-top: 6px; overflow: hidden; }
+        .progress-bar-fill { background: #27ae60; height: 100%; text-align: right; padding-right: 10px; color: white; font-size: 12px; line-height: 22px; font-weight: bold; width: 0%; }
+        .login-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 100; }
+        .login-content { background: white; padding: 25px; border-radius: 10px; text-align: center; width: 300px; }
+        .login-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>वार्ड पंच प्रत्याशी सूची (वार्ड 1 से 9)</h1>
+        <p>अपना वार्ड चुनें और अपने वार्ड पंच को वोट दें</p>
+    </div>
+
+    <div class="admin-bar">
+        <span id="admin-status" style="font-weight: bold; color: #555;">मोड: सामान्य यूजर</span>
+        <div>
+            <a href="index.html" class="btn" style="background:#2c3e50;">⬅️ मुख्य सरपंच पेज पर जाएं</a>
+            <button id="add-btn" class="btn" style="display:none; background:#8e44ad;" onclick="addCandidate()">+ इस वार्ड में पंच जोड़ें</button>
+            <button id="reset-vote-btn" class="btn" style="display:none; background:#7f8c8d;" onclick="resetVotes()">इस वार्ड के वोट रीसेट</button>
+            <button id="auth-btn" class="btn btn-admin" onclick="toggleAuth()">Admin Login</button>
+        </div>
+    </div>
+
+    <!-- वार्ड चुनने की ड्रॉपडाउन लिस्ट -->
+    <div class="ward-selector">
+        <label for="wardSelect">वार्ड चुनें: </label>
+        <select id="wardSelect" onchange="changeWard(this.value)">
+            <option value="1">वार्ड संख्या 01</option>
+            <option value="2">वार्ड संख्या 02</option>
+            <option value="3">वार्ड संख्या 03</option>
+            <option value="4">वार्ड संख्या 04</option>
+            <option value="5">वार्ड संख्या 05</option>
+            <option value="6">वार्ड संख्या 06</option>
+            <option value="7">वार्ड संख्या 07</option>
+            <option value="8">वार्ड संख्या 08</option>
+            <option value="9">वार्ड संख्या 09</option>
+        </select>
+    </div>
+
+    <div class="grid" id="panch-grid"></div>
+
+    <div class="results-section">
+        <h2 id="result-title">📊 वार्ड संख्या 01 के लाइव नतीजे</h2>
+        <div id="panch-results"></div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <h3>एडमिन लॉगिन</h3>
+            <input type="password" id="adminPassword" placeholder="पासवर्ड">
+            <button class="btn" onclick="checkPassword()">लॉगिन</button>
+            <button class="btn" style="background:#e74c3c; margin-top:5px;" onclick="closeLogin()">रद्द</button>
+        </div>
+    </div>
+
+    <script>
+        let isAdmin = false;
+        const DEFAULT_PASS = "Yogesh@2004";
+        let currentWard = "1";
+
+        // वार्ड 1 से 9 का अलग डेटाबेस
+        let allWardsData = JSON.parse(localStorage.getItem('wards_data_v1')) || {
+            "1": [{ id: 101, name: "पंच प्रत्याशी वार्ड 1 (A)", symbol: "कप-प्लेट", votes: 0, image: "https://via.placeholder.com/200" }],
+            "2": [{ id: 201, name: "पंच प्रत्याशी वार्ड 2 (A)", symbol: "बाल्टी", votes: 0, image: "https://via.placeholder.com/200" }],
+            "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": []
+        };
+
+        function changeWard(wardNum) {
+            currentWard = wardNum;
+            document.getElementById('result-title').innerText = `📊 वार्ड संख्या 0${currentWard} के लाइव नतीजे`;
+            renderCandidates();
+        }
+
+        function renderCandidates() {
+            const grid = document.getElementById('panch-grid');
+            grid.innerHTML = '';
+            let candidates = allWardsData[currentWard] || [];
+
+            if(candidates.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888;">इस वार्ड में अभी कोई प्रत्याशी नहीं जोड़ा गया है। एडमिन लॉगिन करके नाम जोड़ें।</p>`;
+            }
+
+            candidates.forEach((c, index) => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${c.image}">
+                        <h3>${c.name}</h3>
+                        <p><b>वार्ड सं.:</b> 0${currentWard}</p>
+                        <p><b>चुनाव चिन्ह:</b> ${c.symbol}</p>
+                        ${isAdmin ? `
+                            <div class="edit-fields" style="display:block;">
+                                <label>फोटो बदलें:</label><input type="file" accept="image/*" onchange="uploadImage(event, ${index})">
+                                <label>नाम:</label><input type="text" value="${c.name}" onchange="updateData(${index}, 'name', this.value)">
+                                <label>चिन्ह:</label><input type="text" value="${c.symbol}" onchange="updateData(${index}, 'symbol', this.value)">
+                                <button class="btn-delete" onclick="deleteCandidate(${index})">🗑️ हटाएं</button>
+                            </div>
+                        ` : `
+                            <button class="vote-btn" onclick="castVote(${index})">वोट दें</button>
+                        `}
+                    </div>
+                `;
+            });
+            renderResults();
+        }
+
+        function renderResults() {
+            const res = document.getElementById('panch-results');
+            res.innerHTML = '';
+            let candidates = allWardsData[currentWard] || [];
+            let totalVotes = candidates.reduce((sum, c) => sum + c.votes, 0);
+
+            candidates.forEach(c => {
+                let percentage = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0;
+                res.innerHTML += `
+                    <div style="margin-bottom: 12px;">
+                        <strong>${c.name} (${c.symbol}):</strong> ${c.votes} वोट (${percentage}%)
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${percentage}%;">${percentage}%</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function castVote(index) {
+            let votedWards = JSON.parse(localStorage.getItem('voted_wards')) || [];
+            if(votedWards.includes(currentWard)) { 
+                alert(`आप वार्ड संख्या 0${currentWard} के लिए पहले ही वोट दे चुके हैं!`); 
+                return; 
+            }
+            allWardsData[currentWard][index].votes++;
+            votedWards.push(currentWard);
+            localStorage.setItem('voted_wards', JSON.stringify(votedWards));
+            saveAndRefresh();
+            alert(`वार्ड संख्या 0${currentWard} में आपका वोट दर्ज हो गया है!`);
+        }
+
+        function addCandidate() {
+            if(!allWardsData[currentWard]) allWardsData[currentWard] = [];
+            allWardsData[currentWard].push({ id: Date.now(), name: "नया वार्ड पंच", symbol: "चिन्ह", votes: 0, image: "https://via.placeholder.com/200" });
+            saveAndRefresh();
+        }
+
+        function deleteCandidate(index) {
+            if (confirm("हटायें?")) { allWardsData[currentWard].splice(index, 1); saveAndRefresh(); }
+        }
+
+        function uploadImage(event, index) {
+            const reader = new FileReader();
+            reader.onload = function() { allWardsData[currentWard][index].image = reader.result; saveAndRefresh(); }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function updateData(index, field, value) { allWardsData[currentWard][index][field] = value; saveAndRefresh(); }
+
+        function resetVotes() {
+            if (confirm(`वार्ड 0${currentWard} के सभी वोट 0 करें?`)) {
+                allWardsData[currentWard].forEach(c => c.votes = 0);
+                saveAndRefresh();
+            }
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('wards_data_v1', JSON.stringify(allWardsData));
+            renderCandidates();
+        }
+
+        function toggleAuth() {
+            if (isAdmin) {
+                isAdmin = false;
+                document.getElementById('admin-status').innerText = "मोड: सामान्य यूजर";
+                document.getElementById('auth-btn').innerText = "Admin Login";
+                document.getElementById('add-btn').style.display = "none";
+                document.getElementById('reset-vote-btn').style.display = "none";
+                renderCandidates();
+            } else {
+                document.getElementById('loginModal').style.display = 'flex';
+            }
+        }
+
+        function checkPassword() {
+            if (document.getElementById('adminPassword').value === DEFAULT_PASS) {
+                isAdmin = true;
+                document.getElementById('admin-status').innerText = "मोड: एडमिन";
+                document.getElementById('auth-btn').innerText = "Logout";
+                document.getElementById('add-btn').style.display = "inline-block";
+                document.getElementById('reset-vote-btn').style.display = "inline-block";
+                closeLogin();
+                renderCandidates();
+            } else { alert("गलत पासवर्ड!"); }
+        }
+
+        function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
+        renderCandidates();
+    </script>
+</body>
+</html>
