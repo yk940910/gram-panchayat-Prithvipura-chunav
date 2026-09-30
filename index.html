@@ -16,11 +16,13 @@
         .admin-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 10px; }
         .btn { background: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
         .btn-admin { background: #e67e22; }
+        .btn-save { background: #27ae60; color: white; border: none; padding: 10px 12px; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; font-size: 15px; }
         .btn-delete { background: #c0392b; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 8px; width: 100%; font-weight: bold; }
         .section-title { background: #2c3e50; color: white; padding: 12px 18px; border-radius: 8px; margin: 20px 0 15px 0; font-size: 20px; border-left: 6px solid #e74c3c; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 12px; padding: 20px 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border: 1px solid #eee; }
         
+        /* गोल और सुंदर फोटो स्टाइल */
         .card img { 
             width: 110px; 
             height: 110px; 
@@ -35,7 +37,7 @@
 
         .vote-btn { background: #2980b9; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; margin-top: 10px; cursor: pointer; font-weight: bold; }
         .edit-fields { display: none; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px; text-align: left; font-size: 14px; }
-        .edit-fields input { width: 100%; padding: 8px; margin: 4px 0 8px 0; border: 1px solid #ccc; border-radius: 4px; }
+        .edit-fields input[type="text"], .edit-fields input[type="file"] { width: 100%; padding: 8px; margin: 4px 0 8px 0; border: 1px solid #ccc; border-radius: 4px; }
         .results-section { background: white; border-radius: 12px; padding: 20px; margin-top: 30px; }
         .progress-bar-bg { background: #e0e0e0; border-radius: 20px; height: 22px; margin-top: 6px; overflow: hidden; }
         .progress-bar-fill { background: #27ae60; height: 100%; text-align: right; padding-right: 10px; color: white; font-size: 12px; line-height: 22px; font-weight: bold; width: 0%; transition: width 0.4s ease; }
@@ -79,7 +81,7 @@
     </div>
 
     <script>
-        // आपकी रियल Firebase प्रोजेक्ट कॉन्फ़िगरेशन
+        // आपकी Firebase प्रोजेक्ट कॉन्फ़िगरेशन
         const firebaseConfig = {
             apiKey: "AIzaSyB0BuD5mx-ppM40j_O2m1H569malJNX26Y",
             authDomain: "panchayat-prithvipura-chunav.firebaseapp.com",
@@ -98,15 +100,15 @@
         const DEFAULT_PASS = "Yogesh@2004";
         let candidates = [];
 
-        // 🔴 रियल-टाइम डेटा सुनने के लिए (Realtime Listener)
+        // रियल-टाइम लाइव डेटा लिसनर
         db.ref('sarpanch_candidates').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 candidates = data;
             } else {
                 candidates = [
-                    { id: 1, name: "सरपंच प्रत्याशी 1", location: "ग्राम पंचायत पृथ्वीपुरा", symbol: "चश्मा", votes: 0, image: "https://via.placeholder.com/150?text=Candidate+1" },
-                    { id: 2, name: "सरपंच प्रत्याशी 2", location: "ग्राम पंचायत पृथ्वीपुरा", symbol: "ट्रैक्टर", votes: 0, image: "https://via.placeholder.com/150?text=Candidate+2" }
+                    { id: 1, name: "सरपंच प्रत्याशी 1", location: "ग्राम पंचायत पृथ्वीपुरा", symbol: "चश्मा", votes: 0, image: "https://via.placeholder.com/150?text=Photo" },
+                    { id: 2, name: "सरपंच प्रत्याशी 2", location: "ग्राम पंचायत पृथ्वीपुरा", symbol: "ट्रैक्टर", votes: 0, image: "https://via.placeholder.com/150?text=Photo" }
                 ];
                 db.ref('sarpanch_candidates').set(candidates);
             }
@@ -124,20 +126,25 @@
             candidates.forEach((c, index) => {
                 grid.innerHTML += `
                     <div class="card">
-                        <img src="${c.image}" alt="${c.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Photo'">
+                        <img id="preview-img-${index}" src="${c.image}" alt="${c.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Photo'">
                         <h3>${c.name}</h3>
                         <p><b>स्थान:</b> ${c.location}</p>
                         <p><b>चिन्ह:</b> ${c.symbol}</p>
                         ${isAdmin ? `
                             <div class="edit-fields" style="display:block;">
-                                <label>फोटो URL Link:</label>
-                                <input type="text" id="img-${index}" value="${c.image}" onchange="updateCandidate(${index})">
-                                <label>नाम:</label>
-                                <input type="text" id="name-${index}" value="${c.name}" onchange="updateCandidate(${index})">
-                                <label>स्थान:</label>
-                                <input type="text" id="loc-${index}" value="${c.location}" onchange="updateCandidate(${index})">
-                                <label>चिन्ह:</label>
-                                <input type="text" id="sym-${index}" value="${c.symbol}" onchange="updateCandidate(${index})">
+                                <label><b>1. गैलरी से फ़ोटो चुनें:</b></label>
+                                <input type="file" accept="image/*" onchange="previewImage(event, ${index})">
+                                
+                                <label><b>2. नाम:</b></label>
+                                <input type="text" id="name-${index}" value="${c.name}">
+                                
+                                <label><b>3. स्थान:</b></label>
+                                <input type="text" id="loc-${index}" value="${c.location}">
+                                
+                                <label><b>4. चिन्ह:</b></label>
+                                <input type="text" id="sym-${index}" value="${c.symbol}">
+                                
+                                <button class="btn-save" onclick="manualSaveCandidate(${index})">💾 जानकारी सेव करें</button>
                                 <button class="btn-delete" onclick="deleteCandidate(${index})">🗑️ प्रत्याशी हटाएं</button>
                             </div>
                         ` : `
@@ -168,6 +175,43 @@
             });
         }
 
+        // गैलरी से चुनी गई फोटो का तुरंत प्रिव्यू दिखाने के लिए
+        function previewImage(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                alert("कृपया 2MB से छोटी फ़ोटो चुनें!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById(`preview-img-${index}`).src = reader.result;
+                candidates[index].tempImage = reader.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // सेव बटन दबाने पर सारा डेटा ऑनलाइन सेव होगा
+        async function manualSaveCandidate(index) {
+            const nameVal = document.getElementById(`name-${index}`).value;
+            const locVal = document.getElementById(`loc-${index}`).value;
+            const symVal = document.getElementById(`sym-${index}`).value;
+
+            if (nameVal) candidates[index].name = nameVal;
+            if (locVal) candidates[index].location = locVal;
+            if (symVal) candidates[index].symbol = symVal;
+
+            if (candidates[index].tempImage) {
+                candidates[index].image = candidates[index].tempImage;
+                delete candidates[index].tempImage;
+            }
+
+            await syncToCloud();
+            alert("प्रत्याशी की जानकारी सफलतापूर्वक सेव हो गई है! ✅");
+        }
+
         async function castVote(index) {
             let voted = localStorage.getItem('voted_sarpanch');
             if(voted) { alert("आप पहले ही वोट दे चुके हैं!"); return; }
@@ -176,14 +220,6 @@
             localStorage.setItem('voted_sarpanch', 'true');
             await syncToCloud();
             alert("आपका वोट तुरंत ऑनलाइन दर्ज हो गया है!");
-        }
-
-        function updateCandidate(index) {
-            candidates[index].name = document.getElementById(`name-${index}`).value;
-            candidates[index].location = document.getElementById(`loc-${index}`).value;
-            candidates[index].symbol = document.getElementById(`sym-${index}`).value;
-            candidates[index].image = document.getElementById(`img-${index}`).value;
-            syncToCloud();
         }
 
         function addCandidate() {
