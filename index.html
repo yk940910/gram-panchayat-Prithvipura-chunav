@@ -14,16 +14,20 @@
         .btn-ward { background: #2980b9; font-size: 16px; padding: 12px 20px; }
         .btn-delete { background: #c0392b; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
         .section-title { background: #2c3e50; color: white; padding: 12px 18px; border-radius: 8px; margin: 20px 0 15px 0; font-size: 20px; border-left: 6px solid #e74c3c; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border: 1px solid #eee; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border: 1px solid #eee; }
         
+        /* छोटे और गोल फ़ोटो की नई स्टाइलिंग */
         .card img { 
-            width: 100%; 
-            height: 220px; 
+            width: 110px; 
+            height: 110px; 
             object-fit: cover; 
-            border-radius: 8px; 
+            border-radius: 50%; /* गोल शेप */
+            margin: 0 auto 12px auto; 
+            display: block;
+            border: 3px solid #2980b9; /* सुंदर नीली बॉर्डर */
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
             background-color: #eaeaea; 
-            border: 1px solid #ddd;
         }
 
         .vote-btn { background: #2980b9; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; margin-top: 10px; cursor: pointer; font-weight: bold; }
@@ -41,7 +45,7 @@
 
     <div class="header">
         <h1>ग्राम पंचायत चुनाव 2026</h1>
-        <p>सरपंच पद चुनाव एवं वार्ड पंच चुनाव पोर्टल (100MB+ IndexedDB Storage)</p>
+        <p>सरपंच पद चुनाव एवं वार्ड पंच चुनाव पोर्टल</p>
     </div>
 
     <div class="admin-bar">
@@ -76,7 +80,7 @@
         const DEFAULT_PASS = "Yogesh@2004";
         let candidates = [];
 
-        // IndexedDB Configuration (100MB+ Memory)
+        // IndexedDB Configuration (100MB+ Storage)
         const DB_NAME = "PanchayatElectionDB";
         const DB_VERSION = 1;
         let db;
@@ -124,14 +128,14 @@
             
             if (!savedData || savedData.length === 0) {
                 candidates = [
-                    { id: 1, name: "सरपंच प्रत्याशी 1", location: "ग्राम पंचायत रामपुर", symbol: "चश्मा", votes: 0, image: "https://via.placeholder.com/300x200?text=Candidate+1" },
-                    { id: 2, name: "सरपंच प्रत्याशी 2", location: "ग्राम पंचायत रामपुर", symbol: "ट्रैक्टर", votes: 0, image: "https://via.placeholder.com/300x200?text=Candidate+2" }
+                    { id: 1, name: "सरपंच प्रत्याशी 1", location: "ग्राम पंचायत रामपुर", symbol: "चश्मा", votes: 0, image: "https://via.placeholder.com/150?text=Candidate+1" },
+                    { id: 2, name: "सरपंच प्रत्याशी 2", location: "ग्राम पंचायत रामपुर", symbol: "ट्रैक्टर", votes: 0, image: "https://via.placeholder.com/150?text=Candidate+2" }
                 ];
                 await saveAllToDB();
             } else {
                 candidates = savedData;
             }
-            renderCandidates();
+                renderCandidates();
         }
 
         function renderCandidates() {
@@ -141,7 +145,7 @@
             candidates.forEach((c, index) => {
                 grid.innerHTML += `
                     <div class="card">
-                        <img src="${c.image}" alt="${c.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                        <img src="${c.image}" alt="${c.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Photo'">
                         <h3>${c.name}</h3>
                         <p><b>स्थान:</b> ${c.location}</p>
                         <p><b>चिन्ह:</b> ${c.symbol}</p>
@@ -207,7 +211,7 @@
                 location: "ग्राम पंचायत", 
                 symbol: "चिन्ह", 
                 votes: 0, 
-                image: "https://via.placeholder.com/300x200?text=New+Candidate" 
+                image: "https://via.placeholder.com/150?text=Photo" 
             });
             await saveAndRefresh();
         }
@@ -223,7 +227,6 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            // IndexedDB 10MB तक की बड़ी इमेज आसानी से संभाल सकता है
             if (file.size > 10 * 1024 * 1024) {
                 alert("कृपया 10MB से छोटी फ़ोटो चुनें!");
                 return;
@@ -287,7 +290,6 @@
             document.getElementById('loginModal').style.display = 'none'; 
         }
 
-        // IndexedDB और डेटा लोड करें
         initApp();
     </script>
 </body>
